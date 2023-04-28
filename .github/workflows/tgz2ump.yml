@@ -1,0 +1,53 @@
+# Convert Firebase SDK from .tgz to Unity Package
+name: .tgz 2 Unity Package
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      base: https://dl.google.com/games/registry/unity/com.google.firebase.remote-config/com.google.firebase.remote-config
+      version: 10.7.0
+      name_version: 10_7_0
+    steps:
+      - uses: actions/checkout@v3
+      - name: Config
+        run: |
+          git config --local user.email "bot@wulato.com"
+          git config --local user.name "wulato-bot"
+      
+      - name: Download Package
+        run: |
+          rm -rf package
+          curl ${{ env.base }}-${{ env.version }}.tgz --output package.tgz
+          tar -xvzf package.tgz
+          rm package.tgz
+      
+      - name: Commit
+        run: |
+          git add --a
+          git commit -m "Firebase SDk-v${{ env.version }}"
+          git push origin
+      
+      - name: Cook UPM
+        run: |
+          git subtree split -P package/ -b upm
+          git checkout upm
+
+      - name: Push UPM
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: upm
+          force: true
+          
+      - name: Github Tag Bump
+        uses: anothrNick/github-tag-action@1.62.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          CUSTOM_TAG: ${{ env.version }}
+          
