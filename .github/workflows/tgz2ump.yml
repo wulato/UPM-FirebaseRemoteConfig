@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       base: https://dl.google.com/games/registry/unity/com.google.firebase.remote-config/com.google.firebase.remote-config
-      version: 10.7.0
-      name_version: 10_7_0
+      version: 11.0.0
+      name_version: 11_0_0
     steps:
       - uses: actions/checkout@v3
       - name: Config
@@ -29,7 +29,7 @@ jobs:
       - name: Commit
         run: |
           git add --a
-          git commit -m "Firebase SDk-v${{ env.version }}"
+          git commit -m "Firebase SDK-v${{ env.version }}"
           git push origin
       
       - name: Cook UPM
